@@ -7,40 +7,31 @@
 
 <style>
 body {
-  background: #0b0e11;
-  color: #e6e6e6;
+  background:#0b0e11;
+  color:#e6e6e6;
   font-family: monospace;
-  padding: 16px;
-  margin: 0;
+  padding:16px;
 }
 
-h1 { color: #00ff9c; }
-h2 { color: #58a6ff; margin-top: 28px; }
+h1 { color:#00ff9c; }
+h2 { color:#58a6ff; margin-top:28px; }
 
-ul { padding-left: 0; list-style: none; }
-
-li {
-  margin-bottom: 14px;
-  padding: 10px;
-  border: 1px solid #1f2937;
-  border-radius: 6px;
+.item {
+  border:1px solid #1f2937;
+  padding:10px;
+  margin-bottom:12px;
+  border-radius:6px;
 }
 
 .title {
-  margin-bottom: 8px;
+  margin-bottom:6px;
 }
 
-button {
-  background: #111827;
-  color: #9cdcfe;
-  border: 1px solid #374151;
-  padding: 6px 10px;
-  border-radius: 4px;
-  font-family: monospace;
-}
-
-button:active {
-  opacity: 0.7;
+.url {
+  color:#9cdcfe;
+  font-size:12px;
+  word-break: break-all;
+  user-select: text;
 }
 </style>
 </head>
@@ -51,50 +42,38 @@ button:active {
 
 <section id="espionage">
   <h2>🕵️ Espionage & Counterintelligence</h2>
-  <ul></ul>
 </section>
 
 <section id="cyber">
   <h2>💻 Cyber Espionage & APTs</h2>
-  <ul></ul>
 </section>
 
 <section id="defence">
   <h2>🪖 Defence & Military Signals</h2>
-  <ul></ul>
 </section>
 
 <script>
 async function loadFeed(feedUrl, elementId) {
   const res = await fetch(`/api/feed?url=${encodeURIComponent(feedUrl)}`);
   const text = await res.text();
-
   const xml = new DOMParser().parseFromString(text, "text/xml");
   const items = xml.querySelectorAll("item");
-  const ul = document.querySelector("#" + elementId + " ul");
-
-  ul.innerHTML = "";
+  const section = document.getElementById(elementId);
 
   items.forEach((item, i) => {
-    if (i >= 8) return;
+    if (i >= 6) return;
 
     const title = item.querySelector("title")?.textContent;
     const link = item.querySelector("link")?.textContent;
     if (!title || !link) return;
 
-    const li = document.createElement("li");
-
-    li.innerHTML = `
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
       <div class="title">${title}</div>
-      <button>OPEN SOURCE</button>
+      <div class="url">${link}</div>
     `;
-
-    li.querySelector("button").onclick = async () => {
-      await navigator.clipboard.writeText(link);
-      alert("Link copied. Paste in browser address bar.");
-    };
-
-    ul.appendChild(li);
+    section.appendChild(div);
   });
 }
 
@@ -102,12 +81,10 @@ loadFeed(
   "https://nitter.poast.org/search/rss?q=espionage+OR+counterintelligence",
   "espionage"
 );
-
 loadFeed(
   "https://nitter.poast.org/search/rss?q=APT+OR+cyber+espionage+nation-state",
   "cyber"
 );
-
 loadFeed(
   "https://nitter.poast.org/search/rss?q=military+exercise+OR+defence+procurement+OR+missile+test",
   "defence"
