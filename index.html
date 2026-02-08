@@ -13,33 +13,17 @@ body {
   padding: 16px;
   margin: 0;
 }
-
-h1 {
-  color: #00ff9c;
-}
-
-h2 {
-  color: #58a6ff;
-  margin-top: 30px;
-}
-
-ul {
-  padding-left: 18px;
-}
-
-li {
-  margin-bottom: 8px;
-}
-
+h1 { color: #00ff9c; }
+h2 { color: #58a6ff; margin-top: 28px; }
+ul { padding-left: 18px; }
+li { margin-bottom: 10px; }
 a {
   color: #9cdcfe;
   text-decoration: none;
-  display: inline-block;
-  padding: 6px 0;
+  display: block;
 }
-
-a:hover {
-  text-decoration: underline;
+a:active {
+  opacity: 0.7;
 }
 </style>
 </head>
@@ -65,16 +49,17 @@ a:hover {
 
 <script>
 async function loadFeed(feedUrl, elementId) {
-  const proxy = "https://cors.isomorphic-git.org/";
-  const res = await fetch(proxy + feedUrl);
+  const res = await fetch(`/api/feed?url=${encodeURIComponent(feedUrl)}`);
   const text = await res.text();
 
   const xml = new DOMParser().parseFromString(text, "text/xml");
   const items = xml.querySelectorAll("item");
   const ul = document.querySelector("#" + elementId + " ul");
 
-  items.forEach((item, index) => {
-    if (index >= 10) return;
+  ul.innerHTML = "";
+
+  items.forEach((item, i) => {
+    if (i >= 10) return;
 
     const title = item.querySelector("title")?.textContent;
     const link = item.querySelector("link")?.textContent;
@@ -82,13 +67,7 @@ async function loadFeed(feedUrl, elementId) {
     if (!title || !link) return;
 
     const li = document.createElement("li");
-    li.innerHTML = `
-      <a href="${link}"
-         target="_blank"
-         rel="noopener noreferrer">
-         ${title}
-      </a>
-    `;
+    li.innerHTML = `<a href="${link}" target="_blank" rel="noopener noreferrer">${title}</a>`;
     ul.appendChild(li);
   });
 }
